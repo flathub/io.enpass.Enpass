@@ -1,7 +1,7 @@
 # io.enpass.Enpass.yaml
 app-id: io.enpass.Enpass
 runtime: org.freedesktop.Platform
-runtime-version: '22.08'
+runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
 command: enpass
 tags: [proprietary]
