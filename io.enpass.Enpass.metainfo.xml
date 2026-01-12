@@ -5,15 +5,15 @@
   <summary>Enpass is a password manager to securely store and manage your passwords and other credentials.</summary>
   <description>
     <p>
+      **NOTE: This wrapper is not verified by, affiliated with, or supported by Enpass Technologies Inc.**
+    </p>    
+    <p>
       Enpass is a password manager that securely stores your passwords and other credentials.
       With Enpass, you only need to remember one master password, and Enpass will take care of the rest.
     </p>
     <p>
       Enpass can autofill passwords for you, generate strong passwords, and sync your data across all your devices.
       Enpass uses AES-256 encryption to secure your data and supports two-factor authentication for added security.
-    </p>
-    <p>
-      NOTE: This wrapper is not verified by, affiliated with, or supported by Enpass Technologies Inc.
     </p>
     <p>
       KNOWN ISSUES:
