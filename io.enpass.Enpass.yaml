@@ -44,15 +44,15 @@ modules:
       - type: extra-data
         filename: enpass.deb
         only-arches: [x86_64]
-        url: https://apt.enpass.io/pool/main/e/enpass/enpass_6.11.13.1957_amd64.deb
-        sha256: 2d8c90643851591aff41057b380a7e87bb839bf5c5aa0ca1456144e9996c902a
+        url: https://apt.enpass.io/pool/main/e/enpass/enpass_6.12.6.2258_amd64.deb
+        sha256: a98d2ff0d6ad392311022453598e59dcc2b9042cf9a001f0bf35e95aed5c3457
         x-checker-data:
           type: debian-repo
           package-name: enpass
           root: https://apt.enpass.io
           dist: stable
           component: main
-        size: 46303162
+        size: 62309506
       - type: script
         dest-filename: apply_extra
         commands:
