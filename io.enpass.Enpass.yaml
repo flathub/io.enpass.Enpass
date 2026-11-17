@@ -1,15 +1,15 @@
 # io.enpass.Enpass.yaml
 app-id: io.enpass.Enpass
 runtime: org.freedesktop.Platform
-runtime-version: '24.08'
+runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
 command: enpass
-tags: [proprietary]
 separate-locales: false
 finish-args:
     # X11 + XShm access
   - --share=ipc
-  - --socket=x11
+  - --socket=wayland
+  - --socket=fallback-x11
     # Notification access
   - --talk-name=org.freedesktop.Notifications
     # System Tray Icon
@@ -24,60 +24,52 @@ modules:
   - name: enpass
     buildsystem: simple
     build-commands:
-      - |
-        # Install scripts
-        install -Dm 755 apply_extra --target-directory ${FLATPAK_DEST}/bin/
-        install -Dm 755 enpass --target-directory ${FLATPAK_DEST}/bin/
+      # Install scripts
+      - install -Dm 755 apply_extra -t ${FLATPAK_DEST}/bin/
+      - install -Dm 755 enpass -t ${FLATPAK_DEST}/bin/
 
-        # Install Desktop, MetaInfo, and MIME
-        install -Dm 644 ${FLATPAK_ID}.desktop --target-directory ${FLATPAK_DEST}/share/applications/
-        install -Dm 644 ${FLATPAK_ID}.metainfo.xml --target-directory ${FLATPAK_DEST}/share/metainfo/
-        install -Dm 644 ${FLATPAK_ID}.mime.xml --target-directory ${FLATPAK_DEST}/share/mime/packages/
-
-        # Install icons
-        install -Dm 644 ${FLATPAK_ID}.svg --target-directory ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/
+      # Install Desktop, MetaInfo, MIME and Icons
+      - install -Dm 644 ${FLATPAK_ID}.desktop -t ${FLATPAK_DEST}/share/applications/
+      - install -Dm 644 ${FLATPAK_ID}.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
+      - install -Dm 644 ${FLATPAK_ID}.mime.xml -t ${FLATPAK_DEST}/share/mime/packages/
+      - install -Dm 644 ${FLATPAK_ID}.svg -t ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/
     sources:
       - type: script
         dest-filename: enpass
         commands:
           - exec /app/extra/enpass/Enpass
+
       - type: extra-data
         filename: enpass.deb
         only-arches: [x86_64]
         url: https://apt.enpass.io/pool/main/e/enpass/enpass_6.12.6.2258_amd64.deb
         sha256: a98d2ff0d6ad392311022453598e59dcc2b9042cf9a001f0bf35e95aed5c3457
+        size: 62309506
         x-checker-data:
           type: debian-repo
           package-name: enpass
           root: https://apt.enpass.io
           dist: stable
           component: main
-        size: 62309506
+
       - type: script
         dest-filename: apply_extra
         commands:
-          - |
-            # =====$(pwd)=====`/app/extra`=====
-            # Env from `build-options` does not carry over, define vars again
-            FLATPAK_ID=io.enpass.Enpass
+          # Env from `build-options` does not carry over, define vars again
+          - FLATPAK_ID=io.enpass.Enpass
+          # Extract upstream package
+          - mkdir -p deb-package export/{bin,share/{icons,mime}}
+          - bsdtar -xvf enpass.deb
+          - tar -xzf data.tar.gz -C deb-package
+          # Install icons
+          - mv deb-package/usr/share/icons export/share/
+          # Rename all icons accordingly
+          - rename enpass ${FLATPAK_ID} export/share/icons/hicolor/*/{apps,status}/*
+          # Install the app
+          - mv deb-package/opt/enpass ./
+          # Cleanup
+          - rm -rf control.tar.* data.tar.* debian-binary deb-package enpass.deb
 
-            # Extract upstream package
-            mkdir -p deb-package export/{bin,share/{icons,mime}}
-
-            bsdtar -xvf enpass.deb
-            tar -xzf data.tar.gz -C deb-package
-
-            # Install icons
-            mv deb-package/usr/share/icons export/share/
-
-            # Rename all icons accordingly
-            rename enpass ${FLATPAK_ID} export/share/icons/hicolor/*/{apps,status}/*
-
-            # Install the app
-            mv deb-package/opt/enpass ./
-
-            # Cleanup
-            rm -rf control.tar.* data.tar.* debian-binary deb-package enpass.deb
       - type: file
         path: icons/io.enpass.Enpass.svg
       - type: file
